@@ -8,5 +8,6 @@ COPY ./pipeline.py /pipeline.py
 COPY ./queue_wrapper.py /queue_wrapper.py
 COPY ./ourown_test.py /test.py
 COPY ./test1.jpg /test1.jpg
+COPY ./model /model
 
 CMD [ "python3", "/pipeline.py" ]

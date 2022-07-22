@@ -13,7 +13,7 @@ import numpy as np
 
 from queue_wrapper import * 
 
-MODEL_PATH = 'https://tfhub.dev/tensorflow/efficientdet/d0/1'
+MODEL_PATH = './model/'
 threshold = 0.5
 detector = hub.load(MODEL_PATH)
 
