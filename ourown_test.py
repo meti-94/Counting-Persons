@@ -23,8 +23,8 @@ RABBITMQ_HOST = '194.5.188.18'
 RABBITMQ_PORT = '8443'
 RABBITMQ_VIRTUAL_HOST = '/'
 
-PUBLISH_QUEUE = 'SendDataCrowdCount'
-CONSUME_QUEUE = 'ReceiveDataCrowdCount'
+PUBLISH_QUEUE = 'CrowdCount.CoreSendingContent_EN_L2'
+CONSUME_QUEUE = 'CrowdCount.CoreReceivingContent_EN_L2'
 
 os.environ['RABBITMQ_USERNAME'] = RABBITMQ_USERNAME
 os.environ['RABBITMQ_PASSWORD'] = RABBITMQ_PASSWORD
@@ -40,7 +40,7 @@ from queue_wrapper import *
 
 
 
-SAMPLE_IMAGE = './test1.jpg'
+SAMPLE_IMAGE = ['https://i.im.ge/2022/07/28/F9kOzG.jpg']*18
 
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -65,17 +65,17 @@ def handler(ch, method, properties, body):
 
     null = None
 
-    print(list(msg['message'].keys()))
+    print(msg['message']['data'])
 
     print('')
 
 
 if __name__ == "__main__":
-    img = Image.open(SAMPLE_IMAGE)
-    im_file = BytesIO()
-    img.save(im_file, format="JPEG")
-    im_bytes = im_file.getvalue()  # im_bytes: image in binary format.
-    im_b64 = base64.b64encode(im_bytes)
+    # img = Image.open(SAMPLE_IMAGE)
+    # im_file = BytesIO()
+    # img.save(im_file, format="JPEG")
+    # im_bytes = im_file.getvalue()  # im_bytes: image in binary format.
+    # im_b64 = base64.b64encode(im_bytes)
     
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     sender_conf = RabbitMQConfiguration(credentials,
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         request_body['sourceAddress'] = "rabbitmq://194.5.188.18:8443/AI01_TestRabbitMq_bus_7qayyyds5urfs8fkbdpfdxpp84?temporary=true"
         request_body['destinationAddress'] = f'rabbitmq://194.5.188.18:8443/{PUBLISH_QUEUE}'
         request_body["messageType"]: [f"urn:message:TestRabbitMq:{PUBLISH_QUEUE}"]
-        response = sender.create_masstransit_response({'id':_id, 'data':im_b64.decode('utf-8')}, request_body)
+        response = sender.create_masstransit_response({'request_id':_id, 'data':SAMPLE_IMAGE}, request_body)
         sender.publish(message=response)
         print('The message is sent!')
 

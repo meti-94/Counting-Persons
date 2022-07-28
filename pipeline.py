@@ -1,13 +1,14 @@
 # from codes.processing_core import * 
 import os
 from masstransitpython import RabbitMQSender
-
+import sys
 import base64
 from io import BytesIO
 from PIL import Image
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
+import requests
 
 # 
 
@@ -16,6 +17,20 @@ from queue_wrapper import *
 MODEL_PATH = './model/'
 threshold = 0.5
 detector = hub.load(MODEL_PATH)
+
+
+def download_image(name, link):
+
+    remote_url = link
+    local_file_name = f'{name}.jpg'
+    try:
+        data = requests.get(remote_url)
+        with open(local_file_name, 'wb')as file:
+            file.write(data.content)
+        return True
+    except:
+        return False
+    
 
 def detect_objects(path: str, model) -> dict:
     """Function extracts image from a file, adds new axis
@@ -26,6 +41,7 @@ def detect_objects(path: str, model) -> dict:
     """
     image_tensor = tf.image.decode_jpeg(
         tf.io.read_file(path), channels=3)[tf.newaxis, ...]
+    # print(type(image_tensor))
     return model(image_tensor)
 
 
@@ -49,22 +65,19 @@ def send_message(body):
     # create sender and send a value
     with DurableRabbitMQSender(sender_conf) as sender:
         sender.set_exchange(PUBLISH_QUEUE)
-        string_image = body['message']['data']
-        byte_image = bytes(string_image, 'utf-8')
-        im_bytes = base64.b64decode(byte_image)
-        im_file = BytesIO(im_bytes)  # convert image to file-like object
-        img = Image.open(im_file)   # 
-        img.save('./temp.jpg')
-        results = detect_objects('./temp.jpg', detector)
-        count = (results['detection_classes'].numpy()[0] == 1)[np.where(
-        results['detection_scores'].numpy()[0] > threshold)].sum()
+        images = body['message']['data']
+        for idx, img in enumerate(images):
+            res = download_image(idx, img)
 
-        
-        # if True:
-        #     print(f'{HANDLER_OPERATION} $ process is invoked')
-        #     print('')
-        _id = body['message']['id']
-        response = sender.create_masstransit_response({'id':_id, 'Count':str(count)}, body)
+
+        print('This is downloaded!')
+        counts = []
+        for idx, img in enumerate(images):
+            results = detect_objects(f'./{idx}.jpg', detector)
+            count = (results['detection_classes'].numpy()[0] == 1)[np.where(results['detection_scores'].numpy()[0] > threshold)].sum()
+            counts.append(str(count))
+        _id = body['message']['request_id']
+        response = sender.create_masstransit_response({'id':_id, 'data':counts}, body)
         sender.publish(message=response)
         if True:
             print('The message is sent!')
