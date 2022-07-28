@@ -64,8 +64,8 @@ def handler(ch, method, properties, body):
     msg = loads(body.decode())
 
     null = None
-
-    print(msg['message']['data'])
+    print(msg['message']['data'], type(msg['message']['data']))
+    print(msg['message']['data']['counts'])
 
     print('')
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         request_body['sourceAddress'] = "rabbitmq://194.5.188.18:8443/AI01_TestRabbitMq_bus_7qayyyds5urfs8fkbdpfdxpp84?temporary=true"
         request_body['destinationAddress'] = f'rabbitmq://194.5.188.18:8443/{PUBLISH_QUEUE}'
         request_body["messageType"]: [f"urn:message:TestRabbitMq:{PUBLISH_QUEUE}"]
-        response = sender.create_masstransit_response({'request_id':_id, 'data':SAMPLE_IMAGE}, request_body)
+        response = sender.create_masstransit_response({'request_id':_id, 'data':{"images":SAMPLE_IMAGE}}, request_body)
         sender.publish(message=response)
         print('The message is sent!')
 
