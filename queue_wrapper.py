@@ -93,9 +93,7 @@ class DurableRabbitMQSender(RabbitMQSender):
               "destinationAddress": request_body['destinationAddress'],
 
               "messageType": [
-
-                f"urn:message:TestRabbitMq:{PUBLISH_QUEUE}"
-
+                "urn:message:SMP.RabbitMQ.Bus.TransferClass:ReceivingContent"
               ],
 
               "message": message,

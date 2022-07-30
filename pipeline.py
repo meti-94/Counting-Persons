@@ -77,7 +77,7 @@ def send_message(body):
             count = (results['detection_classes'].numpy()[0] == 1)[np.where(results['detection_scores'].numpy()[0] > threshold)].sum()
             counts.append(str(count))
         _id = body['message']['request_id']
-        response = sender.create_masstransit_response({'id':_id, 'data':{"counts":counts}}, body)
+        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":counts}, 'issucessfull':'true'}, body)
         sender.publish(message=response)
         if True:
             print('The message is sent!')

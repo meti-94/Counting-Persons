@@ -24,7 +24,7 @@ RABBITMQ_PORT = '8443'
 RABBITMQ_VIRTUAL_HOST = '/'
 
 PUBLISH_QUEUE = 'CrowdCount.CoreSendingContent_EN_L2'
-CONSUME_QUEUE = 'CrowdCount.CoreReceivingContent_EN_L2'
+CONSUME_QUEUE = 'CrowdCount.CoreReceivingContent_L3'
 
 os.environ['RABBITMQ_USERNAME'] = RABBITMQ_USERNAME
 os.environ['RABBITMQ_PASSWORD'] = RABBITMQ_PASSWORD
