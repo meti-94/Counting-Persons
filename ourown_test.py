@@ -24,7 +24,7 @@ RABBITMQ_PORT = '8443'
 RABBITMQ_VIRTUAL_HOST = '/'
 
 PUBLISH_QUEUE = 'CrowdCount.CoreSendingContent_EN_L2'
-CONSUME_QUEUE = 'CrowdCount.CoreReceivingContent_L3'
+CONSUME_QUEUE = 'CrowdCount.CoreReceivingContent_L32'
 
 os.environ['RABBITMQ_USERNAME'] = RABBITMQ_USERNAME
 os.environ['RABBITMQ_PASSWORD'] = RABBITMQ_PASSWORD
@@ -40,8 +40,8 @@ from queue_wrapper import *
 
 
 
-SAMPLE_IMAGE = ['https://i.im.ge/2022/07/28/F9kOzG.jpg']*18
-
+SAMPLE_IMAGE = ['https://i.im.ge/2022/07/28/F9kOzG.jpg', 'https://amnazmoon.com/newtemplate/assets/img/3.jpg']
+SAMPLE_IMAGE = ["https://i.im.ge/2022/07/28/F9kOzG.jpg","https://i.im.ge/2022/07/28/F9kOzG.jpg"]
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):
@@ -96,6 +96,7 @@ if __name__ == "__main__":
         request_body["messageType"]: [f"urn:message:TestRabbitMq:{PUBLISH_QUEUE}"]
         response = sender.create_masstransit_response({'request_id':_id, 'data':{"images":SAMPLE_IMAGE}}, request_body)
         sender.publish(message=response)
+        print(response)
         print('The message is sent!')
 
 

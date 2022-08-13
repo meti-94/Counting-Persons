@@ -23,14 +23,12 @@ def download_image(name, link):
 
     remote_url = link
     local_file_name = f'{name}.jpg'
-    try:
-        data = requests.get(remote_url)
-        with open(local_file_name, 'wb')as file:
-            file.write(data.content)
-        return True
-    except:
-        return False
+    data = requests.get(remote_url)
+    with open(local_file_name, 'wb')as file:
+        file.write(data.content)
+    return True
     
+
 
 def detect_objects(path: str, model) -> dict:
     """Function extracts image from a file, adds new axis
@@ -62,26 +60,34 @@ def send_message(body):
                                         host=RABBITMQ_HOST,
                                         port=RABBITMQ_PORT,
                                         virtual_host=RABBITMQ_VIRTUAL_HOST)
-    # create sender and send a value
-    with DurableRabbitMQSender(sender_conf) as sender:
+    try:
+        _id = body['message']['request_id']
+        res_array = []
+        # create sender and send a value
+        sender = DurableRabbitMQSender(sender_conf)
+        
         sender.set_exchange(PUBLISH_QUEUE)
         images = body['message']['data']['images']
         for idx, img in enumerate(images):
             res = download_image(idx, img)
 
-
-        print('This is downloaded!')
+        print('Downloading is done!')
         counts = []
         for idx, img in enumerate(images):
             results = detect_objects(f'./{idx}.jpg', detector)
             count = (results['detection_classes'].numpy()[0] == 1)[np.where(results['detection_scores'].numpy()[0] > threshold)].sum()
             counts.append(str(count))
-        _id = body['message']['request_id']
-        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":counts}, 'issucessfull':'true'}, body)
+        
+       
+        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":counts}, 'issuccessful':'true', 'exception':''}, body)
         sender.publish(message=response)
-        if True:
-            print('The message is sent!')
-            print('')
+    except Exception as e:
+        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":[]}, 'issuccessful':'false', 'exception':str(e)}, body)
+        sender.publish(message=response)
+    if True:
+        print(response)
+        print('The message is sent!')
+        print('')
 
 
 if __name__ == "__main__":
