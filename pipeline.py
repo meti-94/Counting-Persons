@@ -79,10 +79,10 @@ def send_message(body):
             counts.append(str(count))
         
        
-        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":counts}, 'issuccessful':'true', 'exception':''}, body)
+        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":counts}, 'issuccessful':True, 'exception':''}, body)
         sender.publish(message=response)
     except Exception as e:
-        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":[]}, 'issuccessful':'false', 'exception':str(e)}, body)
+        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":[]}, 'issuccessful':False, 'exception':str(e)}, body)
         sender.publish(message=response)
     if True:
         print(response)
