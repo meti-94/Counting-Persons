@@ -54,6 +54,7 @@ def handler(ch, method, properties, body):
     threads.append(t)
 
 def send_message(body):
+    _id = 'NULL'
     # configure publisher
     sender_conf = RabbitMQConfiguration(credentials,
                                         queue=PUBLISH_QUEUE,
