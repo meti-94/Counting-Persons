@@ -17,23 +17,15 @@ from io import BytesIO
 # This script is aiming at mimic the works are being done in case of raw pushing data into the rabbitmq
 
 # credentials in plain text is placed here intentionally
-RABBITMQ_USERNAME = 'guest'
-RABBITMQ_PASSWORD = 'HahRa@7554%#'
-RABBITMQ_HOST = '194.5.188.18'
-RABBITMQ_PORT = '8443'
-RABBITMQ_VIRTUAL_HOST = '/'
 
-PUBLISH_QUEUE = 'CrowdCount.CoreSendingContent_EN_L2'
-CONSUME_QUEUE = 'CrowdCount.CoreReceivingContent_L32'
+RABBITMQ_USERNAME = os.environ['RABBITMQ_USERNAME']
+RABBITMQ_PASSWORD = os.environ['RABBITMQ_PASSWORD']
+RABBITMQ_HOST = os.environ['RABBITMQ_HOST']
+RABBITMQ_PORT = os.environ['RABBITMQ_PORT']
+RABBITMQ_VIRTUAL_HOST = os.environ['RABBITMQ_VIRTUAL_HOST']
 
-os.environ['RABBITMQ_USERNAME'] = RABBITMQ_USERNAME
-os.environ['RABBITMQ_PASSWORD'] = RABBITMQ_PASSWORD
-os.environ['RABBITMQ_HOST'] = RABBITMQ_HOST
-os.environ['RABBITMQ_PORT'] = RABBITMQ_PORT
-os.environ['RABBITMQ_VIRTUAL_HOST'] = RABBITMQ_VIRTUAL_HOST
-
-os.environ['PUBLISH_QUEUE'] = PUBLISH_QUEUE
-os.environ['CONSUME_QUEUE'] = CONSUME_QUEUE
+PUBLISH_QUEUE = os.environ['PUBLISH_QUEUE']
+CONSUME_QUEUE = os.environ['CONSUME_QUEUE']
 
 from queue_wrapper import *
 
@@ -41,7 +33,9 @@ from queue_wrapper import *
 
 
 SAMPLE_IMAGE = ['https://i.im.ge/2022/07/28/F9kOzG.jpg', 'https://amnazmoon.com/newtemplate/assets/img/3.jpg']
-SAMPLE_IMAGE = ["https://i.im.ge/2022/07/28/F9kOzG.jpg","https://i.im.ge/2022/07/28/F9kOzG.jpg"]
+SAMPLE_IMAGE = ["https://iili.io/DB2sVV.jpg","https://iili.io/DB2sVV.jpg"]*10
+SAMPLE_IMAGE+=['https://iili.io/D86J3b.jpg']
+SAMPLE_IMAGE = ['https://iili.io/D86J3b.jpg']+SAMPLE_IMAGE
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):
@@ -71,12 +65,7 @@ def handler(ch, method, properties, body):
 
 
 if __name__ == "__main__":
-    # img = Image.open(SAMPLE_IMAGE)
-    # im_file = BytesIO()
-    # img.save(im_file, format="JPEG")
-    # im_bytes = im_file.getvalue()  # im_bytes: image in binary format.
-    # im_b64 = base64.b64encode(im_bytes)
-    
+
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     sender_conf = RabbitMQConfiguration(credentials,
                                         queue=PUBLISH_QUEUE,
