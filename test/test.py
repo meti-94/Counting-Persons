@@ -13,7 +13,7 @@ import os
 from PIL import Image
 import base64
 from io import BytesIO
-
+from time import time
 
 # This script is aiming at mimic the works are being done in case of raw pushing data into the rabbitmq
 
@@ -30,7 +30,7 @@ CONSUME_QUEUE = os.environ['CONSUME_QUEUE']
 
 from queue_wrapper import *
 
-
+global count
 
 
 SAMPLE_IMAGE = ["https://iili.io/myctrN.jpg"]*25
@@ -55,16 +55,20 @@ class MessageEncoder(JSONEncoder):
 
 def handler(ch, method, properties, body):
     msg = loads(body.decode())
-
+    global count
+    count+=1
     null = None
     print(msg['message'])
     # print(msg['message']['data']['counts'])
 
     print('')
+    if count==25:
+        print(f'Elapsed time {time()-tic}')
 
 
 if __name__ == "__main__":
-
+    global count
+    count = 0
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     sender_conf = RabbitMQConfiguration(credentials,
                                         queue=PUBLISH_QUEUE,
@@ -75,7 +79,7 @@ if __name__ == "__main__":
     with DurableRabbitMQSender(sender_conf) as sender:
         sender.set_exchange(PUBLISH_QUEUE)
         
-        for i in range(10):
+        for i in range(25):
             _id = str(uuid.uuid4())
         
             request_body = {}
@@ -98,4 +102,5 @@ if __name__ == "__main__":
         # define receiver
         receiver = DurableRabbitMQReceiver(conf, CONSUME_QUEUE)
         receiver.add_on_message_callback(handler)
+        tic = time()
         receiver.start_consuming()
