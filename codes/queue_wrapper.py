@@ -13,6 +13,7 @@ from json import loads, JSONEncoder
 import json
 from uuid import UUID
 import os
+import logging
 
 
 RABBITMQ_USERNAME = os.environ['RABBITMQ_USERNAME']
@@ -53,6 +54,14 @@ class DurableRabbitMQReceiver(RabbitMQReceiver):
                                  exchange=self._exchange,
                                  routing_key=self._routing_key)
         self._on_message_callback = None
+    
+    def start_consuming(self):
+        """ Start consumer with earlier defined callback """
+        logging.info(f"Listening to {self._queue} queue\n")
+        self._channel.basic_consume(queue=self._queue,
+                                    on_message_callback=self._on_message_callback,
+                                    auto_ack=False)
+        self._channel.start_consuming()
 
 class DurableRabbitMQSender(RabbitMQSender):
     def __init__(self, configuration):

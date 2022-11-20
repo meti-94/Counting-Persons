@@ -8,6 +8,7 @@ from threading import Thread
 from json import loads, JSONEncoder
 import json
 from uuid import UUID
+import uuid
 import os
 from PIL import Image
 import base64
@@ -56,8 +57,8 @@ def handler(ch, method, properties, body):
     msg = loads(body.decode())
 
     null = None
-    print(msg['message']['data'], type(msg['message']['data']))
-    print(msg['message']['data']['counts'])
+    print(msg['message'])
+    # print(msg['message']['data']['counts'])
 
     print('')
 
@@ -73,22 +74,20 @@ if __name__ == "__main__":
     # create sender and send a value
     with DurableRabbitMQSender(sender_conf) as sender:
         sender.set_exchange(PUBLISH_QUEUE)
-        _id = '0afe66e7-d89e-47e7-964e-153f7afda4b4'
         
-        request_body = {}
-        request_body['messageId'] = '0afe66e7-d89e-47e7-964e-153f7afda4b4'
-        request_body['conversationId'] = 'ebb00000-76dc-c85b-80ac-08da51bdaf71'
-        request_body['sourceAddress'] = "rabbitmq://194.5.188.18:8443/AI01_TestRabbitMq_bus_7qayyyds5urfs8fkbdpfdxpp84?temporary=true"
-        request_body['destinationAddress'] = f'rabbitmq://194.5.188.18:8443/{PUBLISH_QUEUE}'
-        request_body["messageType"]: [f"urn:message:TestRabbitMq:{PUBLISH_QUEUE}"]
-        response = sender.create_masstransit_response({'request_id':_id, 'data':{"images":SAMPLE_IMAGE}}, request_body)
-        sender.publish(message=response)
-        print(response)
-        print('The message is sent!')
-
-
-    #     ## getting the result
-
+        for i in range(10):
+            _id = str(uuid.uuid4())
+        
+            request_body = {}
+            request_body['messageId'] = '0afe66e7-d89e-47e7-964e-153f7afda4b4'
+            request_body['conversationId'] = 'ebb00000-76dc-c85b-80ac-08da51bdaf71'
+            request_body['sourceAddress'] = "rabbitmq://194.5.188.18:8443/AI01_TestRabbitMq_bus_7qayyyds5urfs8fkbdpfdxpp84?temporary=true"
+            request_body['destinationAddress'] = f'rabbitmq://194.5.188.18:8443/{PUBLISH_QUEUE}'
+            request_body["messageType"]: [f"urn:message:TestRabbitMq:{PUBLISH_QUEUE}"]
+            response = sender.create_masstransit_response({'request_id':_id, 'data':{"images":SAMPLE_IMAGE}}, request_body)
+        
+            sender.publish(message=response)
+            print('The message is sent!')
         credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
         conf = RabbitMQConfiguration(credentials,
                                  queue=CONSUME_QUEUE,
