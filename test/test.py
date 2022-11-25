@@ -14,24 +14,26 @@ from PIL import Image
 import base64
 from io import BytesIO
 from time import time
+import sys
 
 # This script is aiming at mimic the works are being done in case of raw pushing data into the rabbitmq
 
 # credentials in plain text is placed here intentionally
 
-RABBITMQ_USERNAME = os.environ['RABBITMQ_USERNAME']
-RABBITMQ_PASSWORD = os.environ['RABBITMQ_PASSWORD']
-RABBITMQ_HOST = os.environ['RABBITMQ_HOST']
-RABBITMQ_PORT = os.environ['RABBITMQ_PORT']
-RABBITMQ_VIRTUAL_HOST = os.environ['RABBITMQ_VIRTUAL_HOST']
+# RABBITMQ_USERNAME = os.environ['RABBITMQ_USERNAME']
+# RABBITMQ_PASSWORD = os.environ['RABBITMQ_PASSWORD']
+# RABBITMQ_HOST = os.environ['RABBITMQ_HOST']
+# RABBITMQ_PORT = os.environ['RABBITMQ_PORT']
+# RABBITMQ_VIRTUAL_HOST = os.environ['RABBITMQ_VIRTUAL_HOST']
 
-PUBLISH_QUEUE = os.environ['PUBLISH_QUEUE']
-CONSUME_QUEUE = os.environ['CONSUME_QUEUE']
+# PUBLISH_QUEUE = os.environ['CONSUME_QUEUE']
+# CONSUME_QUEUE = os.environ['PUBLISH_QUEUE']
+
 
 from queue_wrapper import *
 
 global count
-
+global rep
 
 SAMPLE_IMAGE = ["https://iili.io/myctrN.jpg"]*25
 
@@ -56,19 +58,21 @@ class MessageEncoder(JSONEncoder):
 def handler(ch, method, properties, body):
     msg = loads(body.decode())
     global count
+    global rep
     count+=1
     null = None
     print(msg['message'])
     # print(msg['message']['data']['counts'])
 
     print('')
-    if count==25:
+    if count==rep:
         print(f'Elapsed time {time()-tic}')
-
+        sys.exit()
 
 if __name__ == "__main__":
     global count
     count = 0
+    rep = 2
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     sender_conf = RabbitMQConfiguration(credentials,
                                         queue=PUBLISH_QUEUE,
@@ -79,7 +83,7 @@ if __name__ == "__main__":
     with DurableRabbitMQSender(sender_conf) as sender:
         sender.set_exchange(PUBLISH_QUEUE)
         
-        for i in range(25):
+        for i in range(rep):
             _id = str(uuid.uuid4())
         
             request_body = {}

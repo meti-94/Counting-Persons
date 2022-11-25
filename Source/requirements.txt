@@ -1,0 +1,11 @@
+masstransitpython-byQ96==0.0.5
+pika==1.3.0
+Pillow==9.2.0
+tqdm
+ipython
+opencv-python-headless
+psutil
+pyyaml
+scipy
+matplotlib
+seaborn
