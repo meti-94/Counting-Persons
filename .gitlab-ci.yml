@@ -1,6 +1,7 @@
 stages:
-  # - build-stage
   - running-test
+  - build-stage
+  
 
 running-test:
   stage: running-test
@@ -12,14 +13,14 @@ running-test:
   only:
     - master
 
-# build-stage:
-#   stage: build-stage
-#   script:
-#     - docker login reg.cicap.ir -u $REG_USER -p $REG_PASS
-#     - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
-#     - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
-#     - docker push reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
+build-stage:
+  stage: build-stage
+  script:
+    - docker login reg.cicap.ir -u $REG_USER -p $REG_PASS
+    - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
+    - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
+    - docker push reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
 
-#   only:
-#     - master
+  only:
+    - master
 
