@@ -4,7 +4,6 @@ build-stage:
   stage: build-stage
   script:
     - docker login reg.cicap.ir -u $REG_USER -p $REG_PASS
-    - cp Dockerfile Dockerfile
     - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
     - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
     - docker push reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
