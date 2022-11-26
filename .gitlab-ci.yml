@@ -1,5 +1,5 @@
 stages:
-  - build-stage
+  # - build-stage
   - running-test
 
 running-test:
@@ -7,19 +7,19 @@ running-test:
   script:
     - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
     - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
-    - docker run -it --cpus="2.0"  --env-file .\DockerUtilities\env.conf reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION bash tests/integrated_test.sh
+    - docker run -it --cpus="2.0"  --env-file DockerUtilities/env.conf reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION bash tests/integrated_test.sh
 
   only:
     - master
 
-build-stage:
-  stage: build-stage
-  script:
-    - docker login reg.cicap.ir -u $REG_USER -p $REG_PASS
-    - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
-    - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
-    - docker push reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
+# build-stage:
+#   stage: build-stage
+#   script:
+#     - docker login reg.cicap.ir -u $REG_USER -p $REG_PASS
+#     - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
+#     - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
+#     - docker push reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
 
-  only:
-    - master
+#   only:
+#     - master
 
