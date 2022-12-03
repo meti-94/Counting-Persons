@@ -72,6 +72,7 @@ if __name__ == "__main__":
         if q1.qsize()<=b.value:
             method_frame, header_frame, body = receiver._channel.basic_get(receiver._queue)
             if method_frame:
+                true = 'True'
                 _id = eval(body.decode('utf-8'))['message']['request_id']
                 images = eval(body.decode('utf-8'))['message']['data']['images']
                 
