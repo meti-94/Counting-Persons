@@ -70,7 +70,10 @@ if __name__ == "__main__":
                     del d[_id]
         # if the buffer is free for preprocess another batch of input
         if q1.qsize()<=b.value:
-            method_frame, header_frame, body = receiver._channel.basic_get(receiver._queue)
+            try:
+                method_frame, header_frame, body = receiver._channel.basic_get(receiver._queue)
+            except:
+                continue
             if method_frame:
                 true = 'True'
                 _id = eval(body.decode('utf-8'))['message']['request_id']

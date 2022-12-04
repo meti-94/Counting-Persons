@@ -95,6 +95,7 @@ if __name__ == "__main__":
             response = sender.create_masstransit_response({'request_id':_id, 'data':{"images":SAMPLE_IMAGE}}, request_body)
         
             sender.publish(message=response)
+            print(response)
             print('The message is sent!')
         credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
         conf = RabbitMQConfiguration(credentials,
