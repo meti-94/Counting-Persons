@@ -28,10 +28,10 @@ def p_process(q1, q2, q3, b):
                 q3.put(error)
             else:
                 if len(err):
-                    error = {_id:(list(err.values())[0]+'Download Thread => Pre-process Process', list(result.values()))}
+                    error = {_id:(list(err.values())[0]+' Download Thread => Pre-process Process', list(result.values()))}
                     q3.put(error)
                 else:
-                    logging.warning(f'Download Is Done In : {(time.time()-tic)} seconds')
+                    logging.warning(f'{_id} Download Is Done In : {(time.time()-tic)} seconds')
                     processed = {_id:[result[idx] for idx in range(len(images))]}
                     q2.put(processed)
         else:
@@ -62,11 +62,21 @@ def download_image(name, link, result, error):
     try:
         remote_url = link
         local_file_name = f'{str(uuid.uuid4())}.jpg'
-        data = requests.get(remote_url)
-        with open(local_file_name, 'wb')as file:
-            file.write(data.content)
-        result[name]=local_file_name
-        return True
+        if is_url_image(remote_url):
+            data = requests.get(remote_url)
+            with open(local_file_name, 'wb')as file:
+                file.write(data.content)
+            result[name]=local_file_name
+            return True
+        else:
+            raise Exception('File Type Is Invalid or The URL Is Down')
     except Exception as e:
         logging.warning(f'Download Error')
         error[link] = str(e)
+
+def is_url_image(image_url):
+   image_formats = ("image/png", "image/jpeg", "image/jpg")
+   r = requests.head(image_url)
+   if r.headers["content-type"] in image_formats:
+      return True
+   return False

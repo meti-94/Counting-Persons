@@ -36,6 +36,7 @@ global count
 global rep
 
 SAMPLE_IMAGE = ["https://iili.io/myctrN.jpg"]*25
+SAMPLE_IMAGE = ["https://i.im.ge/2022/07/28/F9kOzG.jg"]*2
 
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):

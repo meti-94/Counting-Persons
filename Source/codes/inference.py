@@ -24,7 +24,7 @@ def i_process(q2, q3):
                 images = list(processed.values())[0]
                 tic = time.time()
                 counts = detect(images, model)
-                logging.warning(f'Inference Is Done In : {(time.time()-tic)} seconds')
+                logging.warning(f'{_id} Inference Is Done In : {(time.time()-tic)} seconds')
                 infered = {_id:counts}
                 q3.put(infered)
                 for img in images:
