@@ -61,6 +61,7 @@ if __name__ == "__main__":
                     if isinstance(counts[0], str):
                         response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":[]}, 'issuccessful':False, 'exception':counts[0]}, d[_id])
                         sender.publish(message=response)
+                        logging.warning(response)
                         for img in counts[1]:
                             os.remove(img)
                         del d[_id]
@@ -68,6 +69,7 @@ if __name__ == "__main__":
                     else:
                         response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":counts}, 'issuccessful':True, 'exception':''}, d[_id])
                         sender.publish(message=response)
+                        logging.warning(response)
                         del d[_id]
             # if the buffer is free for preprocess another batch of input
             if q1.qsize()<=b.value:
