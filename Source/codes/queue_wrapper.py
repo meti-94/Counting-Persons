@@ -37,8 +37,8 @@ class DurableRabbitMQReceiver(RabbitMQReceiver):
         :param configuration: RabbitMQConfiguration object
         """
         self._configuration = configuration
-        self._connection = BlockingConnection(ConnectionParameters(
-                                                                   heartbeat=0,
+        self._connection = BlockingConnection(ConnectionParameters(heartbeat=600,
+                                                                   blocked_connection_timeout=300,
                                                                    host=self._configuration.host,
                                                                    port=self._configuration.port,
                                                                    virtual_host=self._configuration.virtual_host,
@@ -72,8 +72,8 @@ class DurableRabbitMQSender(RabbitMQSender):
         :param configuration: RabbitMQConfiguration object
         """
         self._configuration = configuration
-        self._connection = BlockingConnection(ConnectionParameters(
-                                                                   heartbeat=600,
+        self._connection = BlockingConnection(ConnectionParameters(heartbeat=600,
+                                                                   blocked_connection_timeout=300,
                                                                    host=self._configuration.host,
                                                                    port=self._configuration.port,
                                                                    virtual_host=self._configuration.virtual_host,

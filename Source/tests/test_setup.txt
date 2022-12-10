@@ -1,8 +1,8 @@
 #!/bin/sh
 export RABBITMQ_USERNAME=guest
-export RABBITMQ_PASSWORD=VeryComplexPassword
+export RABBITMQ_PASSWORD=guest
 export RABBITMQ_HOST=171.22.26.240
-export RABBITMQ_PORT=8443
+export RABBITMQ_PORT=5672
 export RABBITMQ_VIRTUAL_HOST=/
 export PUBLISH_QUEUE=ReceivingContent
 export CONSUME_QUEUE=SendingContent
