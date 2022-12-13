@@ -24,11 +24,11 @@ def p_process(q1, q2, q3, b):
                 for thread in download_threads:
                     thread.join()
             except Exception as e:
-                error = {_id:(str(e)+' Pre-process Process', list(result.values()))}
+                error = {_id:(e, list(result.values()))}
                 q3.put(error)
             else:
                 if len(err):
-                    error = {_id:(list(err.values())[0]+' Download Thread => Pre-process Process', list(result.values()))}
+                    error = {_id:(Exception(list(err.values())[0]+' Download Thread => Pre-process Process'), list(result.values()))}
                     q3.put(error)
                 else:
                     logging.warning(f'{_id} Download Is Done In : {(time.time()-tic)} seconds')

@@ -10,6 +10,7 @@ from codes.preprocess import *
 from codes.queue_wrapper import * 
 
 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.WARNING)
 
 
 
@@ -58,12 +59,20 @@ if __name__ == "__main__":
                     _id = list(infered.keys())[0]
                     counts = list(infered.values())[0]
                     # check if any error has occurred
-                    if isinstance(counts[0], str):
-                        response = sender.create_masstransit_response({'response_id':_id, 'data':{"counts":[]}, 'issuccessful':False, 'exception':counts[0]}, d[_id])
+                    if isinstance(counts[0], Exception):
+
+                        e = counts[0]
+                        response = sender.create_masstransit_response({'response_id':_id, 
+                                                                       'data':{"counts":[]}, 
+                                                                       'issuccessful':False, 
+                                                                       'exception':f"{type(e).__name__}: {e}",
+                                                                       'exception_code':408},
+                                                                       d[_id])
                         sender.publish(message=response)
                         logging.warning(response)
-                        for img in counts[1]:
-                            os.remove(img)
+                        if len(counts)==2 and isinstance(counts[1], list):
+                            for img in counts[1]:
+                                os.remove(img)
                         del d[_id]
                     # or if every thing is all right!
                     else:
@@ -79,9 +88,38 @@ if __name__ == "__main__":
                     continue
                 if method_frame:
                     true = 'True'
-                    _id = eval(body.decode('utf-8'))['message']['request_id']
-                    images = eval(body.decode('utf-8'))['message']['data']['images']
-                    
+                    try:
+                        _id = eval(body.decode('utf-8'))['message']['request_id']
+                    except Exception as e:
+                        if str(e)=="'request_id'":
+                            _id = str(uuid.uuid4())
+                            temp = {_id:eval(body.decode('utf-8'))}
+                            response = sender.create_masstransit_response({'response_id':_id, 
+                                                                            'data':{"counts":[]}, 
+                                                                            'issuccessful':False, 
+                                                                            'exception':f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}",
+                                                                            'exception_code':400},
+                                                                           temp[_id])
+                            sender.publish(message=response)
+                            logging.warning(response)
+                            receiver._channel.basic_ack(method_frame.delivery_tag)
+                            continue        
+                    try:
+                        images = eval(body.decode('utf-8'))['message']['data']['images']
+                    except Exception as e:
+                        if str(e)=="'data'":   
+                            temp = {_id:eval(body.decode('utf-8'))}
+                            response = sender.create_masstransit_response({'response_id':_id, 
+                                                                'data':{"counts":[]}, 
+                                                                'issuccessful':False, 
+                                                                'exception':f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}",
+                                                                'exception_code':204},
+                                                               temp[_id])
+                            sender.publish(message=response)
+                            logging.warning(response)
+                            receiver._channel.basic_ack(method_frame.delivery_tag)  
+                            continue
+
                     data = {_id:images}
                     dc = data.copy()
                     q1.put(dc)
@@ -93,9 +131,10 @@ if __name__ == "__main__":
             # none of the above scenarios happend!
             else:
                 time.sleep(1)
-    except:
+    except Exception as e:
+        print(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         PP.terminate()
         IP.terminate()
         sys.exit(1)
-            
+                
 

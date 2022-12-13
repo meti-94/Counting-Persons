@@ -30,13 +30,13 @@ def i_process(q2, q3):
                 for img in images:
                     os.remove(img)
             except Exception as e:
-                error = {_id:str(e)+' Inference Process'}
+                error = {_id:(e, )}
                 q3.put(error)
         else:
             time.sleep(2)
 
 def detect(batch:list, model) -> list:
-	"""Returns an instance of :class:`List[str]` representing
+    """Returns an instance of :class:`List[str]` representing
     the the number of persons each image inside a batch. 
 
     :param dataframe: A list filled with the the paths related to each image. 
@@ -50,10 +50,8 @@ def detect(batch:list, model) -> list:
     :return: A list which would be filled with strings representing the number of persions in each image
     :rtype:  :class:`List[str]`
     """
-	images = [Image.open(item) for item in batch]
-	results = model(images, size=320)
-	extract = lambda item: item[(item['name']=='person') & (item['confidence']>= threshold)].shape[0]
-	counts = [extract(item) for item in results.pandas().xyxy]
-	return counts
-
-
+    images = [Image.open(item) for item in batch]
+    results = model(images, size=320)
+    extract = lambda item: item[(item['name']=='person') & (item['confidence']>= threshold)].shape[0]
+    counts = [extract(item) for item in results.pandas().xyxy]
+    return counts

@@ -67,9 +67,9 @@ def handler(ch, method, properties, body):
     # print(msg['message']['data']['counts'])
 
     print('')
-    if count==rep:
-        print(f'Elapsed time {time()-tic}')
-        sys.exit()
+    # if count==rep:
+    #     print(f'Elapsed time {time()-tic}')
+    #     sys.exit()
 
 if __name__ == "__main__":
     global count
