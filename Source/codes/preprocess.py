@@ -3,76 +3,53 @@ import uuid
 import time
 import threading
 import logging
+import os
 
 
-
-def p_process(q1, q2, q3, b):
+def p_process(links_priority_queue, images_queue):
     while True:
-        if (q1.qsize()!=0 and q2.qsize()<=b.value):
-            raw = q1.get()
-            result = {}
-            err = {}
-            _id = list(raw.keys())[0]
-            try:
-                images = list(raw.values())[0]
-                download_threads = []
-                tic = time.time()
-                for idx, img in enumerate(images):
-                    temp_thread = threading.Thread(target=download_image, args=(idx, img, result, err))
-                    temp_thread.start()
-                    download_threads.append(temp_thread)
-                for thread in download_threads:
-                    thread.join()
-            except Exception as e:
-                error = {_id:(e, list(result.values()))}
-                q3.put(error)
+        if links_priority_queue.empty() == False:
+            item = links_priority_queue.get()
+            item_dict = item[-1]
+            if item_dict['exception']!='':
+                item_dict.pop('links')
+                item_dict['images'] = []
+                images_queue.put(item_dict)
             else:
-                if len(err):
-                    error = {_id:(Exception(list(err.values())[0]+' Download Thread => Pre-process Process'), list(result.values()))}
-                    q3.put(error)
-                else:
-                    logging.warning(f'{_id} Download Is Done In : {(time.time()-tic)} seconds')
-                    processed = {_id:[result[idx] for idx in range(len(images))]}
-                    q2.put(processed)
+                try:                    
+                    _id, image_files = multithread_download(item_dict['id'], item_dict['links'])
+                    item_dict.pop('links')
+                    item_dict['images'] = image_files
+                    assert _id == item_dict['id']
+                    images_queue.put(item_dict)
+                except Exception as e:
+                    item_dict.pop('links')
+                    item_dict['images'] = []
+                    item_dict['exception'] = f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}",
+                    item_dict['exception_code'] = 204
+                    item_dict['issuccessful'] = False
+                    images_queue.put(item_dict)
+            
         else:
             time.sleep(2)
 
-def download_image(name, link, result, error):
-    """Gets download link and saves the file with specified name in the current directory
-
-    :param name: The name of downloaded image 
-    :type name: :class:`str`
-    
-    :param link: The link to download the image 
-    :type link: :class:`str`
-
-    :param result: The resulted image files  
-    :type result: :class:`dict`
-
-    :param error: If any error has occured 
-    :type error: :class:`dict`
-
-    :raises Connection Timeout: Occures whenever the connection has been lost
-    
-
-
-    :return: None
-    :rtype:  :class:`None`
-    """
+def multithread_download(_id, links):
     try:
-        remote_url = link
-        local_file_name = f'{str(uuid.uuid4())}.jpg'
-        if is_url_image(remote_url):
-            data = requests.get(remote_url)
-            with open(local_file_name, 'wb')as file:
-                file.write(data.content)
-            result[name]=local_file_name
-            return True
-        else:
-            raise Exception('File Type Is Invalid or The URL Is Down')
+        path = os.path.join('./codes/tmp/', _id)
+        os.mkdir(path)
+        download_threads = []
+        for idx, lnk in enumerate(links):
+            temp_thread = threading.Thread(target=download, args=(idx, lnk, path))
+            temp_thread.start()
+            download_threads.append(temp_thread)
+        for thread in download_threads:
+            thread.join()
+        image_files = [item for item in os.listdir(path) if os.path.isfile(os.path.join(path, item))] 
+        image_files = [os.path.join(path, item) for item in image_files] 
+        return _id, image_files
     except Exception as e:
-        logging.warning(f'Download Error')
-        error[link] = str(e)
+        logging.warning(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        raise e
 
 def is_url_image(image_url):
    image_formats = ("image/png", "image/jpeg", "image/jpg")
@@ -80,3 +57,91 @@ def is_url_image(image_url):
    if r.headers["content-type"] in image_formats:
       return True
    return False
+
+def download(name, link, path):
+    try:
+        remote_url = link
+        file_name = os.path.join(path, f'{str(uuid.uuid4())}.jpg')
+        # file_name = f'{path}/{str(uuid.uuid4())}.jpg'
+        if is_url_image(remote_url):
+            data = requests.get(remote_url)
+            with open(file_name, 'wb')as file:
+                file.write(data.content)
+    except Exception as e:
+        logging.warning(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        raise e
+
+# def p_process(q1, q2, q3, b):
+#     while True:
+#         if (q1.qsize()!=0 and q2.qsize()<=b.value):
+#             raw = q1.get()
+#             result = {}
+#             err = {}
+#             _id = list(raw.keys())[0]
+#             try:
+#                 images = list(raw.values())[0]
+#                 download_threads = []
+#                 tic = time.time()
+#                 for idx, img in enumerate(images):
+#                     temp_thread = threading.Thread(target=download_image, args=(idx, img, result, err))
+#                     temp_thread.start()
+#                     download_threads.append(temp_thread)
+#                 for thread in download_threads:
+#                     thread.join()
+#             except Exception as e:
+#                 error = {_id:(e, list(result.values()))}
+#                 q3.put(error)
+#             else:
+#                 if len(err):
+#                     error = {_id:(Exception(list(err.values())[0]+' Download Thread => Pre-process Process'), list(result.values()))}
+#                     q3.put(error)
+#                 else:
+#                     logging.warning(f'{_id} Download Is Done In : {(time.time()-tic)} seconds')
+#                     processed = {_id:[result[idx] for idx in range(len(images))]}
+#                     q2.put(processed)
+#         else:
+#             time.sleep(2)
+
+# def download_image(name, link, result, error):
+#     """Gets download link and saves the file with specified name in the current directory
+
+#     :param name: The name of downloaded image 
+#     :type name: :class:`str`
+    
+#     :param link: The link to download the image 
+#     :type link: :class:`str`
+
+#     :param result: The resulted image files  
+#     :type result: :class:`dict`
+
+#     :param error: If any error has occured 
+#     :type error: :class:`dict`
+
+#     :raises Connection Timeout: Occures whenever the connection has been lost
+    
+
+
+#     :return: None
+#     :rtype:  :class:`None`
+#     """
+#     try:
+#         remote_url = link
+#         local_file_name = f'{str(uuid.uuid4())}.jpg'
+#         if is_url_image(remote_url):
+#             data = requests.get(remote_url)
+#             with open(local_file_name, 'wb')as file:
+#                 file.write(data.content)
+#             result[name]=local_file_name
+#             return True
+#         else:
+#             raise Exception('File Type Is Invalid or The URL Is Down')
+#     except Exception as e:
+#         logging.warning(f'Download Error')
+#         error[link] = str(e)
+
+# def is_url_image(image_url):
+#    image_formats = ("image/png", "image/jpeg", "image/jpg")
+#    r = requests.head(image_url)
+#    if r.headers["content-type"] in image_formats:
+#       return True
+#    return False

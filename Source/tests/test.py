@@ -38,7 +38,17 @@ global rep
 SAMPLE_IMAGE = ["https://iili.io/myctrN.jpg"]*25
 # SAMPLE_IMAGE = ["https://i.im.ge/2022/07/28/F9kOzG.jg"]*2
 # SAMPLE_IMAGE = ["https://amnazmoon.com/AppData/tehranExamsUNI/RandomShot/Image/9126302730/53672884-018e-42ff-9695-8e2758383a9c.jpg"]
-
+SAMPLE_IMAGE = ["https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/dad65df0-020e-4250-92a0-0f0056afb663.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/05952432-a2e0-4f56-b93c-2b3a5ed3912d.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/5200ad88-d153-4c1b-ad7a-26a450b26d74.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/ff061e64-f96f-41cb-9a4c-3325a6ea7f0b.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/150ef213-d05d-464f-8782-41f79564ff07.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/1e80c995-8a2a-4e7c-b49e-546f2cc7d288.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/d1869255-5cff-48fe-af4a-6e50370229b9.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/3b9fe11c-4a66-4e5e-9b92-7278efc9c961.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/b06cd693-e7aa-486a-a518-8c3baa026448.jpg",
+                "https://amnazmoon.faran.ac.ir/AppData/Tehran-ExamUNI/RandomShot/Image/1087/326d389b-5406-4f0d-9098-8c58593935ce.jpg"]
+                
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):
