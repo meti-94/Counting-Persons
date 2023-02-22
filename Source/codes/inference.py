@@ -38,7 +38,7 @@ def i_process(images_queue, counts_queue):
             try:
                 shutil.rmtree(os.path.join('./codes/tmp/', item_dict['id']))
             except OSError as e:
-                logging.warning("Error: %s : %s" % (dir_path, e.strerror))     
+                logging.warning("Error: %s : %s" % (f'./codes/tmp/{item_dict["id"]}', e.strerror))     
         else:
             time.sleep(2)
 

@@ -25,10 +25,10 @@ RABBITMQ_PORT = os.environ['RABBITMQ_PORT']
 RABBITMQ_VIRTUAL_HOST = os.environ['RABBITMQ_VIRTUAL_HOST']
 VERBOSE = os.environ['VERBOSE']
 
+CORE_CONSUME_QUEUE = os.environ['CORE_CONSUME_QUEUE']
+RAPID_CONSUME_QUEUE = os.environ['RAPID_CONSUME_QUEUE']
+UTIL_CONSUME_QUEUE = os.environ['UTIL_CONSUME_QUEUE']
 PUBLISH_QUEUE = os.environ['PUBLISH_QUEUE']
-CONSUME_QUEUE = os.environ['CONSUME_QUEUE']
-
-
 
 
 class RabbitMQReceiver():
@@ -113,7 +113,7 @@ class DurableRabbitMQReceiver(RabbitMQReceiver):
         logging.info(f"Listening to {self._queue} queue\n")
         self._channel.basic_consume(queue=self._queue,
                                     on_message_callback=self._on_message_callback,
-                                    auto_ack=False)
+                                    auto_ack=True)
         self._channel.start_consuming()
 
 class DurableRabbitMQSender(RabbitMQSender):

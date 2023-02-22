@@ -19,14 +19,16 @@ import sys
 
 
 from queue_wrapper import *
-CORE_PUBLISH_QUEUE = os.environ['CORE_CONSUME_QUEUE']
+CORE_CONSUME_QUEUE = os.environ['CORE_CONSUME_QUEUE']
 RAPID_CONSUME_QUEUE = os.environ['RAPID_CONSUME_QUEUE']
 UTIL_CONSUME_QUEUE = os.environ['UTIL_CONSUME_QUEUE']
+PUBLISH_QUEUE = os.environ['PUBLISH_QUEUE']
+
 
 global count
 global rep
 
-SAMPLE_IMAGE = ["https://iili.io/myctrN.jpg"]*5
+SAMPLE_IMAGE = ["h1ttps://iili.io/myctrN.jpg"]*5
 
                 
 class UUIDEncoder(json.JSONEncoder):
@@ -47,18 +49,31 @@ class MessageEncoder(JSONEncoder):
         return o.__dict__
 
 
+def handler(ch, method, properties, body):
+    msg = loads(body.decode())
+    global count
+    global rep
+    count+=1
+    null = None
+    print(msg['message'])
+    print('')
+    if count==6:
+        sys.exit()
+
 
 if __name__ == "__main__":
+    global count
+    count = 0
     rep = 2
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     sender_conf = RabbitMQConfiguration(credentials,
-                                        queue=CORE_PUBLISH_QUEUE,
+                                        queue=CORE_CONSUME_QUEUE,
                                         host=RABBITMQ_HOST,
                                         port=RABBITMQ_PORT,
                                         virtual_host=RABBITMQ_VIRTUAL_HOST)
     # create sender and send a value
     with DurableRabbitMQSender(sender_conf) as sender:
-        sender.set_exchange(CORE_PUBLISH_QUEUE)
+        sender.set_exchange(CORE_CONSUME_QUEUE)
         
         for i in range(rep):
             _id = f'CORE_CONSUME_QUEUE{i}'
@@ -67,13 +82,13 @@ if __name__ == "__main__":
             request_body['messageId'] = '0afe66e7-d89e-47e7-964e-153f7afda4b4'
             request_body['conversationId'] = 'ebb00000-76dc-c85b-80ac-08da51bdaf71'
             request_body['sourceAddress'] = "rabbitmq://194.5.188.18:8443/AI01_TestRabbitMq_bus_7qayyyds5urfs8fkbdpfdxpp84?temporary=true"
-            request_body['destinationAddress'] = f'rabbitmq://194.5.188.18:8443/{CORE_PUBLISH_QUEUE}'
-            request_body["messageType"]: [f"urn:message:TestRabbitMq:{CORE_PUBLISH_QUEUE}"]
+            request_body['destinationAddress'] = f'rabbitmq://194.5.188.18:8443/{CORE_CONSUME_QUEUE}'
+            request_body["messageType"]: [f"urn:message:TestRabbitMq:{CORE_CONSUME_QUEUE}"]
             response = sender.create_masstransit_response({'request_id':_id, 'data':{"images":SAMPLE_IMAGE}}, request_body)
         
             sender.publish(message=response)
             print(response)
-            print('The message is sent to CORE_PUBLISH_QUEUE!')
+            print('The message is sent to CORE_CONSUME_QUEUE!')
     
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     sender_conf = RabbitMQConfiguration(credentials,
@@ -124,3 +139,15 @@ if __name__ == "__main__":
             sender.publish(message=response)
             print(response)
             print('The message is sent to UTIL_CONSUME_QUEUE!')
+    credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
+    conf = RabbitMQConfiguration(credentials,
+                             queue=PUBLISH_QUEUE,
+                             host=RABBITMQ_HOST,
+                             port=RABBITMQ_PORT,
+                             virtual_host=RABBITMQ_VIRTUAL_HOST)
+
+    # define receiver
+    receiver = DurableRabbitMQReceiver(conf, PUBLISH_QUEUE)
+    receiver.add_on_message_callback(handler)
+    print(f'Start listening to : {PUBLISH_QUEUE}!')
+    receiver.start_consuming()
