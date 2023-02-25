@@ -14,6 +14,23 @@ threshold = 0.5
 model = None
 
 def i_process(images_queue, counts_queue):
+
+    """
+    Fills the corresponding queue with the appropriate response of :class:`dict[str]` representing
+    the number of persons in each image inside a batch. In case of any error occurred it fills 
+    exception key of the dictionary.
+
+    :param images_queue: A Queue contains input batches of image paths filled with the consumer process. 
+    :type dataframe: :class:`queue`    
+    :param counts_queue: A Queue to be filled with the counts of people in the images. 
+    :type dataframe: :class:`queue`
+
+    :raises Model not found: Occurs whenever the program can't find model file
+    :raises Image not found: Occurs whenever the program can't find input image
+    
+
+    """
+
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
     while True:
         if images_queue.empty() == False:
@@ -43,40 +60,19 @@ def i_process(images_queue, counts_queue):
             time.sleep(2)
 
 
-# def i_process(q2, q3):
-#     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-#     while True:
-#         if q2.qsize()!=0:
-#             processed = q2.get()
-#             _id = list(processed.keys())[0]
-#             try:
-#                 images = list(processed.values())[0]
-#                 tic = time.time()
-#                 counts = detect(images, model)
-#                 logging.warning(f'{_id} Inference Is Done In : {(time.time()-tic)} seconds')
-#                 infered = {_id:counts}
-#                 q3.put(infered)
-#                 for img in images:
-#                     os.remove(img)
-#             except Exception as e:
-#                 error = {_id:(e, )}
-#                 q3.put(error)
-#         else:
-#             time.sleep(2)
 
 def detect(batch:list, model) -> list:
-    """Returns an instance of :class:`List[str]` representing
-    the the number of persons each image inside a batch. 
+    """ Returns an instance of :class:`List[str]` representing
+    the number of persons in each image inside a batch. 
 
     :param dataframe: A list filled with the the paths related to each image. 
     :type dataframe: :class:`List[str]`
     
-    :raises Model not found: Occures whenever the program can't find model file
-    :raises Image not found: Occures whenever the program can't find input image
+    :raises Memory Error: Occurs whenever the program can not fit into memory 
     
 
 
-    :return: A list which would be filled with strings representing the number of persions in each image
+    :return: A list that would be filled with strings representing the number of persons in each image
     :rtype:  :class:`List[str]`
     """
     images = [Image.open(item) for item in batch]

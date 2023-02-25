@@ -1,0 +1,53 @@
+codes package
+=============
+
+Submodules
+----------
+
+codes.consumer module
+---------------------
+
+.. automodule:: codes.consumer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+codes.inference module
+----------------------
+
+.. automodule:: codes.inference
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+codes.preprocess module
+-----------------------
+
+.. automodule:: codes.preprocess
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+codes.publisher module
+----------------------
+
+.. automodule:: codes.publisher
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+codes.queue\_wrapper module
+---------------------------
+
+.. automodule:: codes.queue_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: codes
+   :members:
+   :undoc-members:
+   :show-inheritance:

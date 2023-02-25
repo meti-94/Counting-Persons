@@ -32,6 +32,11 @@ PUBLISH_QUEUE = os.environ['PUBLISH_QUEUE']
 
 
 class RabbitMQReceiver():
+    """
+        This class overwrites the original class from the library
+        by eliminating the singleton feature which I absolutely don't 
+        comprehend why it developed in the first place!
+    """
     __slots__ = ["_configuration", "_connection", "_channel", "_queue", "_routing_key", "_exchange",
                  "_on_message_callback"]
 
@@ -77,7 +82,11 @@ class RabbitMQReceiver():
 
 
 class DurableRabbitMQReceiver(RabbitMQReceiver):
-    
+    """
+        This class instantiates and configures a durable rabbit receiver. 
+        The listener/Sender class should be compatible with the exchange/queue settings. 
+    """
+
     def __init__(self, configuration, exchange, routing_key=''):
         """
         Create RabbitMQ Sender
@@ -117,6 +126,11 @@ class DurableRabbitMQReceiver(RabbitMQReceiver):
         self._channel.start_consuming()
 
 class DurableRabbitMQSender(RabbitMQSender):
+    """
+        This class instantiates and configures a durable rabbit sender. 
+        The listener/Sender class should be compatible with the exchange/queue settings. 
+    """
+ 
     def __init__(self, configuration):
         """
         Create RabbitMQ Sender

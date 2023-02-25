@@ -43,4 +43,4 @@ def publish(counts_queue):
             sender.publish(message=response)
             logging.warning(response)
         else:
-            time.sleep(2)
+            time.sleep(1)

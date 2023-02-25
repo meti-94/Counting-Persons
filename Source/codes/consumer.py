@@ -16,6 +16,19 @@ UTIL_CONSUME_QUEUE = os.environ['UTIL_CONSUME_QUEUE']
 
 
 def consume(links_priority_queue, threshold):
+    """
+    Fills the corresponding queue with the appropriate response of :class:`dict[str]` representing
+    the number of persons in each image inside a batch. In case of any error occurred it fills 
+    exception key of the dictionary.
+
+    :param links_priority_queue: A Priority Queue contains input batches of image paths filled with the consumer process. 
+    :type links_priority_queue: :class:`priority queue`    
+    :param threshold: An integer value indicates the number of buffered requests. 
+    :type dataframe: :class:`int`
+
+    :raises Connection Error: Occurs whenever the program can't find Rabbit
+    
+    """
     credentials = PlainCredentials(RABBITMQ_USERNAME, RABBITMQ_PASSWORD)
     core_receiver_conf = RabbitMQConfiguration(credentials,
                                  queue=CORE_CONSUME_QUEUE,
@@ -86,6 +99,21 @@ def consume(links_priority_queue, threshold):
 
 
 def parser(message_body):
+
+    """
+    It Parses the body of rabbitMQ message into a predefined template. 
+    In case of failure, it includes the first exception in using its key. 
+    
+    :param message_body: A list filled with the the paths related to each image. 
+    :type message_body: :class:`dict`
+
+    :raises Key not found: Occurs whenever the program can parse the input
+
+    :return: A dict that would be filled with the appropriate set of data from the message body
+    :rtype:  :class:`dict` 
+
+    """
+
     payload = {}
     try:
         true = 'True'
