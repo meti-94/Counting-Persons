@@ -69,5 +69,5 @@ if __name__ == "__main__":
     # publisher_process.join()
 
     while True:
-        logging.warning(f'Size of Links queue:{links_priority_queue.qsize()}\tSize of Links queue:{images_queue.qsize()}\tSize of Links queue:{counts_queue.qsize()}')
+        logging.warning(f'Size of Links queue:{links_priority_queue.qsize()}\tSize of Images queue:{images_queue.qsize()}\tSize of Counts queue:{counts_queue.qsize()}')
         time.sleep(5)

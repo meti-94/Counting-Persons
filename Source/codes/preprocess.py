@@ -64,7 +64,7 @@ def multithread_download(_id, links):
     :rtype:  :class:`List[str]`
     """
     try:
-        path = os.path.join('./codes/tmp/', _id)
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tmp', _id)
         os.mkdir(path)
         download_threads = []
         for idx, lnk in enumerate(links):
@@ -79,6 +79,20 @@ def multithread_download(_id, links):
     except Exception as e:
         logging.warning(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
         raise e
+
+def download(name, link, path):
+    try:
+        remote_url = link
+        file_name = os.path.join(path, f'{str(uuid.uuid4())}.jpg')
+        # file_name = f'{path}/{str(uuid.uuid4())}.jpg'
+        if is_url_image(remote_url):
+            data = requests.get(remote_url)
+            with open(file_name, 'wb')as file:
+                file.write(data.content)
+    except Exception as e:
+        logging.warning(f"{type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}")
+        raise e
+
 
 def is_url_image(image_url):
     """
