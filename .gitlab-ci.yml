@@ -8,7 +8,7 @@ running-test:
   script:
     - LAB_RANDOM_VERSION=$((1 + RANDOM % 10000))
     - docker build . -t reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION
-    - docker run -i --cpus="2.0"  --env-file DockerUtilities/env.conf reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION bash test/integrated_test.sh
+    - docker run -i --cpus="2.0"  --env-file DockerUtilities/env.conf reg.cicap.ir/cores/crowdcounting:lab-$LAB_RANDOM_VERSION bash ../test/integrated_test.sh
 
   only:
     - master
