@@ -12,9 +12,11 @@
 * Install necessary libreries 
 * Set up remote/local RabbitMQ
 * Set environment variables for Queue credentials
-* Run `python pipeline.py`
-* Run the `Source/tests/test.py`
-* There is a shell script containing best practices for starting in `Source/Test/integrated_test.sh`
+* Run `python /Source/pipeline.py`
+* Run the `Tests/test.py`
+* There is a shell script containing best practices for starting in `Test/integrated_test.sh`
+* There is a Preliminary Site containing up-to-date documentation for the service in `Documents\_build\html\index.html`
+![Documentation Site](Documents/Capture.PNG)
 # Usage
 build
 ```powershell
@@ -26,7 +28,8 @@ docker run -it --env-file .\DockerUtilities\conv.env crowdcounting
 ```
 
 # Change log
-* `1.X`: prototyping
-* `2.X`: Error handling
-* `3.X`: Stable Version 
+* `1.X`: Prototyping
+* `2.X`: Error Handling
+* `3.X`: Stable Version
+* `4.X`: Synchronous Responses, Auto-generated Documentation
 
